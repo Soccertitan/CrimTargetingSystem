@@ -1,0 +1,23 @@
+﻿{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "CrimTargetingSystem",
+	"Description": "Provides functionality to rotate the view of the player towards a target.",
+	"Category": "Other",
+	"CreatedBy": "Soccertitan",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "CrimTargetingSystem",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
