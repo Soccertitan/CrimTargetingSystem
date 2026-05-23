@@ -1,9 +1,9 @@
 ﻿// Copyright Soccertitan 2026
 
 
-#include "LockOnTypes.h"
+#include "CrimTargetingTypes.h"
 
-#include "LockOnPointInterface.h"
+#include "TargetPointInterface.h"
 
 
 bool FCrimTargetPoint::IsValid() const
@@ -30,18 +30,18 @@ bool FCrimTargetPoint::IsTargetable(APlayerController* PlayerController) const
 {
 	if (USceneComponent* StrongSceneComp = SceneComponent.Get())
 	{
-		if (StrongSceneComp->Implements<ULockOnPointInterface>())
+		if (StrongSceneComp->Implements<UTargetPointInterface>())
 		{
-			return ILockOnPointInterface::Execute_IsLockOnPointTargetable(StrongSceneComp, PlayerController);
+			return ITargetPointInterface::Execute_IsTargetPointTargetable(StrongSceneComp, PlayerController);
 		}
 		return true;
 	}
 	
 	if (AActor* StrongActor = Actor.Get())
 	{
-		if (StrongActor->Implements<ULockOnPointInterface>())
+		if (StrongActor->Implements<UTargetPointInterface>())
 		{
-			return ILockOnPointInterface::Execute_IsLockOnPointTargetable(StrongActor, PlayerController);
+			return ITargetPointInterface::Execute_IsTargetPointTargetable(StrongActor, PlayerController);
 		}
 		return true;
 	}

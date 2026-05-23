@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "LockOnPointInterface.h"
+#include "TargetPointInterface.h"
 #include "Components/SphereComponent.h"
 #include "StructUtils/InstancedStruct.h"
-#include "LockOnPointComponent.generated.h"
+#include "TargetPointComponent.generated.h"
 
 
 /**
- * Defines a point that can be locked onto. Can be managed by a LockOnPointManagerComponent.
+ * A simple sphere component that can be locked onto. Can be managed by a TargetPointManagerComponent.
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class CRIMLOCKONSYSTEM_API ULockOnPointComponent : public USphereComponent, public ILockOnPointInterface
+class CRIMTARGETINGSYSTEM_API UTargetPointComponent : public USphereComponent, public ITargetPointInterface
 {
 	GENERATED_BODY()
 
 public:
-	ULockOnPointComponent();
+	UTargetPointComponent();
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreNetReceive() override;
 	virtual void OnRegister() override;
@@ -31,7 +31,7 @@ public:
 	void SetLockOnPointTag(UPARAM(ref) FGameplayTag& InLockOnPointTag);
 	
 	/** ILockOnPointInterface */
-	virtual bool IsLockOnPointTargetable_Implementation(APlayerController* SourcePlayerController) override;
+	virtual bool IsTargetPointTargetable_Implementation(APlayerController* SourcePlayerController) override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "LockOn System")
 	void SetIsTargetable(const bool bEnable);

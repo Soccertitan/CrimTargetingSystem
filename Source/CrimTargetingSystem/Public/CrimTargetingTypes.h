@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "LockOnTypes.generated.h"
+#include "CrimTargetingTypes.generated.h"
 
 
 /** 
@@ -11,7 +11,7 @@
  * both SceneComp and Actor is valid.
  */
 USTRUCT(BlueprintType)
-struct CRIMLOCKONSYSTEM_API FCrimTargetPoint
+struct CRIMTARGETINGSYSTEM_API FCrimTargetPoint
 {
 	GENERATED_BODY()
 	

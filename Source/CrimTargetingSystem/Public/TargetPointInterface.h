@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "LockOnPointInterface.generated.h"
+#include "TargetPointInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class ULockOnPointInterface : public UInterface
+class UTargetPointInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
 /**
- * 
+ * Can be added to actors/components to determine if it can be targeted.
  */
-class CRIMLOCKONSYSTEM_API ILockOnPointInterface
+class CRIMTARGETINGSYSTEM_API ITargetPointInterface
 {
 	GENERATED_BODY()
 
@@ -24,5 +24,5 @@ class CRIMLOCKONSYSTEM_API ILockOnPointInterface
 public:
 	/** Returns true if the PlayerController can lock onto the point. */
 	UFUNCTION(BlueprintNativeEvent)
-	bool IsLockOnPointTargetable(APlayerController* SourcePlayerController);
+	bool IsTargetPointTargetable(APlayerController* SourcePlayerController);
 };

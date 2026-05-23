@@ -1,0 +1,33 @@
+﻿// Copyright Soccertitan 2026
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "CrimTargetingSystemBlueprintFunctionLibrary.generated.h"
+
+struct FCrimTargetPoint;
+
+/**
+ * 
+ */
+UCLASS()
+class CRIMTARGETINGSYSTEM_API UCrimTargetingSystemBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+	
+public:
+	UFUNCTION(BlueprintPure, Category = "Targeting System", DisplayName = "IsValid")
+	static bool IsTargetPointValid(const FCrimTargetPoint& TargetPoint);
+	
+	/** Will return true if the PlayerController can target the TargetPoint. */
+	UFUNCTION(BlueprintPure, Category = "Targeting System")
+	static bool IsTargetPointTargetable(APlayerController* PlayerController, const FCrimTargetPoint& TargetPoint);
+	
+	UFUNCTION(BlueprintPure, Category = "Targeting System")
+	static FVector GetTargetPointLocation(const FCrimTargetPoint& TargetPoint);
+	
+	/** Returns the actor that is referenced in the TargetPoint. */
+	UFUNCTION(BlueprintPure, Category = "Targeting System")
+	static AActor* GetActor(const FCrimTargetPoint& TargetPoint);
+};

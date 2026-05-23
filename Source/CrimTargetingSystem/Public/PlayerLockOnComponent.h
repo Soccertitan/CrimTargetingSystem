@@ -3,74 +3,76 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "LockOnTypes.h"
+#include "CrimTargetingTypes.h"
 #include "Components/ActorComponent.h"
-#include "LockOnSystemComponent.generated.h"
+#include "PlayerLockOnComponent.generated.h"
 
 
-class ULockOnPointComponent;
+class UTargetPointComponent;
 class UCharacterMovementComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLockOnSystemLockOnPointSignature, const FLockOnPoint&, OldLockOnPoint, const FCrimTargetPoint&, NewLockOnPoint);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerLockOnTargetPointSignature, const FCrimTargetPoint&, OldTargetPoint, const FCrimTargetPoint&, NewTargetPoint);
 
 /**
- * A component that can be added to a PlayerController to rotate the Camera and Pawn to face the lock on point.
+ * A component that can be added to a PlayerController to rotate the view to the targeted point. If you want the pawn
+ * to rotate towards the target, add the PawnTargetPointInterface to either the pawn or a component. It will call the function
+ * automatically on the controlled pawn/component.
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class CRIMLOCKONSYSTEM_API ULockOnSystemComponent : public UActorComponent
+class CRIMTARGETINGSYSTEM_API UPlayerLockOnComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	ULockOnSystemComponent();
+	UPlayerLockOnComponent();
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreNetReceive() override;
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
-	/** [Client + Server] When the lock on point changes. */
-	UPROPERTY(BlueprintAssignable, DisplayName = "OnLockedOnPointChanged")
-	FLockOnSystemLockOnPointSignature OnLockedOnPointChangedDelegate;
+	/** [Client + Server] When the TargetPoint changes. */
+	UPROPERTY(BlueprintAssignable, DisplayName = "OnTargetPointChanged")
+	FPlayerLockOnTargetPointSignature OnTargetPointChangedDelegate;
 
 	/**
 	 * Sets the camera lock to the new point.
-	 * @param InLockOnPoint The point to lock onto.
+	 * @param InTargetPoint The point to lock onto.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "LockOn System")
-	void SetLockOnPoint(const FCrimTargetPoint& InLockOnPoint);
+	void SetTargetPoint(const FCrimTargetPoint& InTargetPoint);
 	
-	/** Clears the lock on the target. */
+	/** Clears the locked on target. */
 	UFUNCTION(BlueprintCallable, Category = "LockOn System")
-	void ClearLockOnPoint();
+	void ClearTargetPoint();
 	
-	/** Returns a const reference to the currently locked on point. */
+	/** Returns a const reference to the currently targeted point. */
 	UFUNCTION(BlueprintPure, Category = "LockOn System")
-	const FCrimTargetPoint& GetLockOnPoint() const { return LockOnPoint; }
+	const FCrimTargetPoint& GetTargetPoint() const { return TargetPoint; }
 
 protected:
-	/** The maximum distance from a LockOnPoint that allows Locking on. */
+	/** The maximum distance from a TargetPoint that allows locking on. */
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn System")
-	float MaxLockOnRange = 2000.0f;
+	float MaxTargetingRange = 2000.0f;
 
 	/** Frequency to check if the target is in line of sight, within range, and is generally targetable. */
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn System")
 	float CheckFrequency = 0.1f;
 	
-	/** The amount of time to break the LockOn when the Actor is too far away or obstructed behind an Object. */
+	/** The amount of time to break the target when the Actor is too far away or obstructed behind an Object. */
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn System")
 	float BreakLockOnDelay = 2.0f;
 
-	/** Whether to accept control input when Locked on. */
+	/** Whether to accept control input when locked on. */
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn System|Rotation")
 	bool bIgnoreLookInput = true;
 
-	/** The rate of rotation to face the LockOnPoint when IgnoreLookInput is false. */
+	/** The rate of rotation to face the TargetPoint when IgnoreLookInput is false. */
 	UPROPERTY(EditDefaultsOnly, Category = "LockOn System|Rotation", meta = (EditCondition="bIgnoreLookInput==false", ClampMin = 0.f))
-	float CameraInterpSpeed = 2.0f;
+	float CameraInterpSpeed = 4.0f;
 	
 	/**
 	 * Setting this to true will tell the LockOn System to adjust the Pitch Offset (the Y axis) when locked on,
-	 * depending on the distance to the target actor.
+	 * depending on the distance to the target point.
 	 * It will ensure that the Camera will be moved up vertically the closer this Actor gets to its target.
 	 * Formula:
 	 * (DistanceToTarget * PitchDistanceCoefficient + PitchDistanceOffset) * -1.0f
@@ -93,7 +95,7 @@ protected:
 	
 	virtual void OnRegister() override;
 	
-	virtual void OnLockOnPointChanged(const FCrimTargetPoint& OldLockOnPoint, const FCrimTargetPoint& NewLockOnPoint);
+	virtual void OnTargetPointChanged(const FCrimTargetPoint& OldTargetPoint, const FCrimTargetPoint& NewTargetPoint);
 	
 	UFUNCTION()
 	virtual void OnPossessedPawnChanged(APawn* OldPawn, APawn* NewPawn);
@@ -112,24 +114,23 @@ private:
 	UPROPERTY()
 	TObjectPtr<APawn> ControlledPawn;
 	
-	// The object of the controlled pawn that implements the interface. It may be the pawn or one of it's components.
+	// An object of the controlled pawn that implements the interface. It may be the pawn or one of its components.
 	UPROPERTY()
 	TObjectPtr<UObject> LockOnPawnInterface;
 	
 	// The currently locked onto actor/component.
-	UPROPERTY(ReplicatedUsing = "OnRep_LockOnPoint")
-	FCrimTargetPoint LockOnPoint;
+	UPROPERTY(ReplicatedUsing = "OnRep_TargetPoint")
+	FCrimTargetPoint TargetPoint;
 	
-	// The last LockOnPoint that was used.
 	UPROPERTY()
-	FCrimTargetPoint PreviousLockOnPoint;
+	FCrimTargetPoint PreviousTargetPoint;
 	
-	/** Functionality to clear the LockOnPoint if line of sight is broken or is not targetable. */
-	FTimerHandle CheckLockOntPointTimerHandle;
-	FTimerHandle BreakLockOnPointTimerHandle;
+	/** Functionality to clear the TargetPoint if line of sight is broken or is not targetable. */
+	FTimerHandle CheckTargetPointTimerHandle;
+	FTimerHandle BreakTargetPointTimerHandle;
 	bool bIsBreakingLineOfSight;
 	
-	void CheckLockOnPoint();
+	void CheckTargetPoint();
 	bool ShouldBreakLockOn() const;
 	void BreakLockOn();
 	
@@ -137,21 +138,21 @@ private:
 	 * Sets the control rotation on the owning player controller.
 	 */
 	void SetControlRotation(float DeltaTime) const;
-	/** Gets the rotation for the camera to face the LockOnPoint */
+	/** Gets the rotation for the camera to face the TargetPoint */
 	FRotator GetTargetControlRotation() const;
 	
 	UFUNCTION()
-	void OnLockedOnPointOwnerDestroyed(AActor* DestroyedActor);
+	void OnTargetPointOwnerDestroyed(AActor* DestroyedActor);
 	
 	UFUNCTION()
-	void OnRep_LockOnPoint();
+	void OnRep_TargetPoint();
 	
-	void InitNewLockPoint(const FCrimTargetPoint& NewLockOnPoint);
-	void DeinitOldLockOnPoint(const FCrimTargetPoint& OldLockOnPoint);
-	
-	UFUNCTION(Server, Reliable)
-	void Server_SetLockOnPoint(const FCrimTargetPoint& InParams);
+	void InitNewTargetPoint(const FCrimTargetPoint& NewTargetPoint);
+	void DeinitOldTargetPoint(const FCrimTargetPoint& OldTargetPoint);
 	
 	UFUNCTION(Server, Reliable)
-	void Server_ClearLockOnPoint();
+	void Server_SetTargetPoint(const FCrimTargetPoint& InTargetPoint);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_ClearTargetPoint();
 };

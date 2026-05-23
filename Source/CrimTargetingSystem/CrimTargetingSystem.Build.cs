@@ -26,7 +26,8 @@ public class CrimTargetingSystem : ModuleRules
 			new string[]
 			{
 				"Core",
-				"NetCore"
+				"NetCore",
+				"GameplayTags"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

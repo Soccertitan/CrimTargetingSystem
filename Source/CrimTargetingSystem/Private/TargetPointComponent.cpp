@@ -1,13 +1,13 @@
 ﻿// Copyright Soccertitan 2026
 
 
-#include "LockOnPointComponent.h"
+#include "TargetPointComponent.h"
 
 #include "Net/UnrealNetwork.h"
 #include "Net/Core/PushModel/PushModel.h"
 
 
-ULockOnPointComponent::ULockOnPointComponent()
+UTargetPointComponent::UTargetPointComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
@@ -19,7 +19,7 @@ ULockOnPointComponent::ULockOnPointComponent()
 	SphereRadius = 0.f;
 }
 
-void ULockOnPointComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UTargetPointComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
@@ -31,25 +31,25 @@ void ULockOnPointComponent::GetLifetimeReplicatedProps(TArray<class FLifetimePro
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, CustomData, COND_None, REPNOTIFY_OnChanged);
 }
 
-void ULockOnPointComponent::PreNetReceive()
+void UTargetPointComponent::PreNetReceive()
 {
 	Super::PreNetReceive();
 	CacheIsNetSimulated();
 }
 
-void ULockOnPointComponent::OnRegister()
+void UTargetPointComponent::OnRegister()
 {
 	Super::OnRegister();
 	CacheIsNetSimulated();
 }
 
-void ULockOnPointComponent::BeginPlay()
+void UTargetPointComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	CacheIsNetSimulated();
 }
 
-void ULockOnPointComponent::SetLockOnPointTag(FGameplayTag& InLockOnPointTag)
+void UTargetPointComponent::SetLockOnPointTag(FGameplayTag& InLockOnPointTag)
 {
 	if (HasAuthority() && InLockOnPointTag.IsValid())
 	{
@@ -61,12 +61,12 @@ void ULockOnPointComponent::SetLockOnPointTag(FGameplayTag& InLockOnPointTag)
 	}
 }
 
-bool ULockOnPointComponent::IsLockOnPointTargetable_Implementation(APlayerController* SourcePlayerController)
+bool UTargetPointComponent::IsTargetPointTargetable_Implementation(APlayerController* SourcePlayerController)
 {
 	return bTargetable;
 }
 
-void ULockOnPointComponent::SetIsTargetable(const bool bEnable)
+void UTargetPointComponent::SetIsTargetable(const bool bEnable)
 {
 	if (HasAuthority() && bTargetable != bEnable)
 	{
@@ -75,7 +75,7 @@ void ULockOnPointComponent::SetIsTargetable(const bool bEnable)
 	}
 }
 
-void ULockOnPointComponent::SetCustomData(const FInstancedStruct& InCustomData)
+void UTargetPointComponent::SetCustomData(const FInstancedStruct& InCustomData)
 {
 	if (HasAuthority() && InCustomData.IsValid())
 	{
@@ -85,17 +85,17 @@ void ULockOnPointComponent::SetCustomData(const FInstancedStruct& InCustomData)
 	}
 }
 
-void ULockOnPointComponent::OnRep_CustomData()
+void UTargetPointComponent::OnRep_CustomData()
 {
 	OnCustomDataSet();
 }
 
-bool ULockOnPointComponent::HasAuthority() const
+bool UTargetPointComponent::HasAuthority() const
 {
 	return !bCachedIsNetSimulated;
 }
 
-void ULockOnPointComponent::CacheIsNetSimulated()
+void UTargetPointComponent::CacheIsNetSimulated()
 {
 	bCachedIsNetSimulated = IsNetSimulating();
 }
