@@ -22,7 +22,7 @@ class CRIMTARGETINGSYSTEM_API ITargetPointInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	/** Returns true if the PlayerController can lock onto the point. */
+	/** Returns true if the Controller can lock onto the point. */
 	UFUNCTION(BlueprintNativeEvent)
-	bool IsTargetPointTargetable(APlayerController* SourcePlayerController);
+	bool IsTargetPointTargetable(AController* SourceController);
 };

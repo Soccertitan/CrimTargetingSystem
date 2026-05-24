@@ -26,15 +26,15 @@ AActor* FCrimTargetPoint::GetActor() const
 	return Actor.Get();
 }
 
-bool FCrimTargetPoint::IsTargetable(APlayerController* PlayerController) const
+bool FCrimTargetPoint::IsTargetable(AController* Controller) const
 {
-	if (PlayerController)
+	if (Controller)
 	{
 		if (USceneComponent* StrongSceneComp = SceneComponent.Get())
 		{
 			if (StrongSceneComp->Implements<UTargetPointInterface>())
 			{
-				return ITargetPointInterface::Execute_IsTargetPointTargetable(StrongSceneComp, PlayerController);
+				return ITargetPointInterface::Execute_IsTargetPointTargetable(StrongSceneComp, Controller);
 			}
 			return true;
 		}
@@ -43,7 +43,7 @@ bool FCrimTargetPoint::IsTargetable(APlayerController* PlayerController) const
 		{
 			if (StrongActor->Implements<UTargetPointInterface>())
 			{
-				return ITargetPointInterface::Execute_IsTargetPointTargetable(StrongActor, PlayerController);
+				return ITargetPointInterface::Execute_IsTargetPointTargetable(StrongActor, Controller);
 			}
 			return true;
 		}

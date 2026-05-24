@@ -13,9 +13,9 @@ bool UCrimTargetingSystemBlueprintFunctionLibrary::IsTargetPointValid(const FCri
 	return TargetPoint.IsValid();
 }
 
-bool UCrimTargetingSystemBlueprintFunctionLibrary::IsTargetPointTargetable(APlayerController* PlayerController, const FCrimTargetPoint& TargetPoint)
+bool UCrimTargetingSystemBlueprintFunctionLibrary::IsTargetPointTargetable(AController* Controller, const FCrimTargetPoint& TargetPoint)
 {
-	return TargetPoint.IsTargetable(PlayerController);
+	return TargetPoint.IsTargetable(Controller);
 }
 
 FVector UCrimTargetingSystemBlueprintFunctionLibrary::GetTargetPointLocation(const FCrimTargetPoint& TargetPoint)

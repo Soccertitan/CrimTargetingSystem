@@ -31,7 +31,7 @@ public:
 	void SetLockOnPointTag(UPARAM(ref) FGameplayTag& InLockOnPointTag);
 	
 	/** ILockOnPointInterface */
-	virtual bool IsTargetPointTargetable_Implementation(APlayerController* SourcePlayerController) override;
+	virtual bool IsTargetPointTargetable_Implementation(AController* SourceController) override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "LockOn System")
 	void SetIsTargetable(const bool bEnable);

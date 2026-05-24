@@ -25,7 +25,7 @@ struct CRIMTARGETINGSYSTEM_API FCrimTargetPoint
 	
 	bool IsValid() const;
 	AActor* GetActor() const;
-	bool IsTargetable(APlayerController* PlayerController) const;
+	bool IsTargetable(AController* Controller) const;
 	FVector GetLocation() const;
 
 	void Reset();

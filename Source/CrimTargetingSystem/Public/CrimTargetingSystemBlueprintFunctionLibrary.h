@@ -21,9 +21,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Targeting System", DisplayName = "IsValid")
 	static bool IsTargetPointValid(const FCrimTargetPoint& TargetPoint);
 	
-	/** Will return true if the PlayerController can target the TargetPoint. */
+	/** Will return true if the Controller can target the TargetPoint. */
 	UFUNCTION(BlueprintPure, Category = "Targeting System")
-	static bool IsTargetPointTargetable(APlayerController* PlayerController, const FCrimTargetPoint& TargetPoint);
+	static bool IsTargetPointTargetable(AController* Controller, const FCrimTargetPoint& TargetPoint);
 	
 	UFUNCTION(BlueprintPure, Category = "Targeting System")
 	static FVector GetTargetPointLocation(const FCrimTargetPoint& TargetPoint);

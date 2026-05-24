@@ -130,7 +130,7 @@ private:
 	void CacheIsNetSimulated();
 	
 	UPROPERTY()
-	TObjectPtr<APlayerController> PlayerController;
+	TObjectPtr<AController> Controller;
 	
 	// The pawn controlled by the player controller.
 	UPROPERTY()

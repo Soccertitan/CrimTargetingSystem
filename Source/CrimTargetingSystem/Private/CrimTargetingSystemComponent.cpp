@@ -49,7 +49,7 @@ void UCrimTargetingSystemComponent::TickComponent(float DeltaTime, enum ELevelTi
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (TargetPoint.IsValid() && PlayerController)
+	if (TargetPoint.IsValid() && Controller)
 	{
 		if (bLockedOn)
 		{
@@ -64,7 +64,7 @@ void UCrimTargetingSystemComponent::TickComponent(float DeltaTime, enum ELevelTi
 
 void UCrimTargetingSystemComponent::SetTargetPoint(const FCrimTargetPoint& InTargetPoint)
 {
-	if (InTargetPoint != TargetPoint && InTargetPoint.IsTargetable(PlayerController))
+	if (InTargetPoint != TargetPoint && InTargetPoint.IsTargetable(Controller))
 	{
 		PreviousTargetPoint = TargetPoint;
 		TargetPoint = InTargetPoint;
@@ -136,21 +136,21 @@ void UCrimTargetingSystemComponent::SetLockOnState(const bool bEnable)
 
 void UCrimTargetingSystemComponent::SetPlayerController(APlayerController* PC)
 {
-	if (PC != PlayerController)
+	if (PC != Controller)
 	{
-		if (PlayerController)
+		if (Controller)
 		{
 			SetLockOnState(false);
 			OnPossessedPawnChanged(ControlledPawn, nullptr);
-			PlayerController->OnPossessedPawnChanged.RemoveAll(this);
+			Controller->OnPossessedPawnChanged.RemoveAll(this);
 		}
 		
-		PlayerController = PC;
+		Controller = PC;
 		
-		if (PlayerController)
+		if (Controller)
 		{
-			OnPossessedPawnChanged(nullptr, PlayerController->GetPawn());
-			PlayerController->OnPossessedPawnChanged.AddUniqueDynamic(this, &UCrimTargetingSystemComponent::OnPossessedPawnChanged);
+			OnPossessedPawnChanged(nullptr, Controller->GetPawn());
+			Controller->OnPossessedPawnChanged.AddUniqueDynamic(this, &UCrimTargetingSystemComponent::OnPossessedPawnChanged);
 		}
 	}
 }
@@ -189,9 +189,9 @@ void UCrimTargetingSystemComponent::OnLockOnStateChanged()
 {
 	OnLockOnStateChangedDelegate.Broadcast(bLockedOn);
 	
-	if (bIgnoreLookInput && PlayerController)
+	if (bIgnoreLookInput && Controller)
 	{
-		PlayerController->SetIgnoreLookInput(bLockedOn);
+		Controller->SetIgnoreLookInput(bLockedOn);
 	}
 	if (PawnTargetingInterface)
 	{
@@ -298,7 +298,7 @@ void UCrimTargetingSystemComponent::CheckTargetPoint()
 
 bool UCrimTargetingSystemComponent::ShouldBreakTargeting() const
 {
-	if (!UCrimTargetingSystemBlueprintFunctionLibrary::IsTargetPointTargetable(PlayerController, TargetPoint))
+	if (!UCrimTargetingSystemBlueprintFunctionLibrary::IsTargetPointTargetable(Controller, TargetPoint))
 	{
 		return true;
 	}
@@ -343,13 +343,13 @@ void UCrimTargetingSystemComponent::SetControlRotation(float DeltaTime) const
 {
 	const FRotator TargetControlRotation = GetTargetControlRotation();
 	
-	const FRotator InterpTargetControlRotation = FMath::RInterpTo(PlayerController->GetControlRotation(), TargetControlRotation, DeltaTime, CameraInterpSpeed);
-	PlayerController->SetControlRotation(InterpTargetControlRotation);
+	const FRotator InterpTargetControlRotation = FMath::RInterpTo(Controller->GetControlRotation(), TargetControlRotation, DeltaTime, CameraInterpSpeed);
+	Controller->SetControlRotation(InterpTargetControlRotation);
 }
 
 FRotator UCrimTargetingSystemComponent::GetTargetControlRotation() const
 {
-	const FRotator ControlRotation = PlayerController->GetControlRotation();
+	const FRotator ControlRotation = Controller->GetControlRotation();
 	const FVector PawnLocation = ControlledPawn->GetActorLocation();
 	const FVector LockOnPointLocation = UCrimTargetingSystemBlueprintFunctionLibrary::GetTargetPointLocation(TargetPoint);
 	
