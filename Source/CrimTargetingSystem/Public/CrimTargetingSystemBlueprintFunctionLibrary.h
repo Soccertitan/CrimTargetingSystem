@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "CrimTargetingSystemBlueprintFunctionLibrary.generated.h"
 
+class UCrimTargetingSystemComponent;
 struct FCrimTargetPoint;
 
 /**
@@ -30,4 +31,7 @@ public:
 	/** Returns the actor that is referenced in the TargetPoint. */
 	UFUNCTION(BlueprintPure, Category = "Targeting System")
 	static AActor* GetActor(const FCrimTargetPoint& TargetPoint);
+	
+	UFUNCTION(BlueprintPure, Category = "Targeting System", meta = (DefaultToSelf="Actor"))
+	static UCrimTargetingSystemComponent* GetCrimTargetingSystemComponent(AActor* Actor, bool bSearchComponent = true);
 };
