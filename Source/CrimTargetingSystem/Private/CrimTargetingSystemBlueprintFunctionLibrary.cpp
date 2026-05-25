@@ -28,6 +28,21 @@ AActor* UCrimTargetingSystemBlueprintFunctionLibrary::GetActor(const FCrimTarget
 	return TargetPoint.GetActor();
 }
 
+FCrimTargetPoint UCrimTargetingSystemBlueprintFunctionLibrary::MakeTargetPointFromHitResult(const FHitResult& HitResult)
+{
+	return FCrimTargetPoint(HitResult);
+}
+
+FCrimTargetPoint UCrimTargetingSystemBlueprintFunctionLibrary::MakeTargetPointFromActor(AActor* Actor)
+{
+	return FCrimTargetPoint(Actor);
+}
+
+FCrimTargetPoint UCrimTargetingSystemBlueprintFunctionLibrary::MakeTargetPointFromSceneComponent(USceneComponent* SceneComponent, FName SocketName)
+{
+	return FCrimTargetPoint(SceneComponent, SocketName);
+}
+
 UCrimTargetingSystemComponent* UCrimTargetingSystemBlueprintFunctionLibrary::GetCrimTargetingSystemComponent(AActor* Actor, bool bSearchComponent)
 {
 	if (Actor)

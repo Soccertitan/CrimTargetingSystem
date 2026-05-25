@@ -15,16 +15,15 @@ struct CRIMTARGETINGSYSTEM_API FCrimTargetPoint
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(BlueprintReadWrite)
-	TWeakObjectPtr<USceneComponent> SceneComponent;
-	UPROPERTY(BlueprintReadWrite)
-	FName SocketName;
-	
-	UPROPERTY(BlueprintReadWrite)
-	TWeakObjectPtr<AActor> Actor;
+	FCrimTargetPoint(){}
+	FCrimTargetPoint(const FHitResult& HitResult);
+	FCrimTargetPoint(AActor* Actor);
+	FCrimTargetPoint(USceneComponent* SceneComponent, FName InSocketName);
 	
 	bool IsValid() const;
 	AActor* GetActor() const;
+	USceneComponent* GetSceneComponent() const;
+	FName GetSocketName() const { return SocketName; }
 	bool IsTargetable(AController* Controller) const;
 	FVector GetLocation() const;
 
@@ -32,11 +31,20 @@ struct CRIMTARGETINGSYSTEM_API FCrimTargetPoint
 	
 	friend bool operator==(const FCrimTargetPoint& X, const FCrimTargetPoint& Y)
 	{
-		return X.Actor == Y.Actor && X.SceneComponent == Y.SceneComponent && X.SocketName == Y.SocketName;
+		return X.WeakActor == Y.WeakActor && X.WeakSceneComponent == Y.WeakSceneComponent && X.SocketName == Y.SocketName;
 	}
 	
 	friend bool operator!=(const FCrimTargetPoint& X, const FCrimTargetPoint& Y)
 	{
 		return !(X == Y);
 	}
+	
+private:
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TWeakObjectPtr<USceneComponent> WeakSceneComponent;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FName SocketName;
+	
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TWeakObjectPtr<AActor> WeakActor;
 };

@@ -6,9 +6,31 @@
 #include "TargetPointInterface.h"
 
 
+FCrimTargetPoint::FCrimTargetPoint(const FHitResult& HitResult)
+{
+	WeakSceneComponent = HitResult.Component;
+	SocketName = HitResult.BoneName;
+	WeakActor = HitResult.GetActor();
+}
+
+FCrimTargetPoint::FCrimTargetPoint(AActor* Actor)
+{
+	WeakActor = Actor;
+}
+
+FCrimTargetPoint::FCrimTargetPoint(USceneComponent* SceneComponent, FName InSocketName)
+{
+	if (SceneComponent)
+	{
+		WeakSceneComponent = SceneComponent;
+		SocketName = InSocketName;
+		WeakActor = SceneComponent->GetAttachmentRootActor();
+	}
+}
+
 bool FCrimTargetPoint::IsValid() const
 {
-	if (SceneComponent.Get() || Actor.Get())
+	if (WeakSceneComponent.Get() || WeakActor.Get())
 	{
 		return true;
 	}
@@ -18,19 +40,19 @@ bool FCrimTargetPoint::IsValid() const
 
 AActor* FCrimTargetPoint::GetActor() const
 {
-	if (const USceneComponent* StrongSceneComp = SceneComponent.Get())
-	{
-		return StrongSceneComp->GetOwner();
-	}
+	return WeakActor.Get();
+}
 
-	return Actor.Get();
+USceneComponent* FCrimTargetPoint::GetSceneComponent() const
+{
+	return WeakSceneComponent.Get();
 }
 
 bool FCrimTargetPoint::IsTargetable(AController* Controller) const
 {
 	if (Controller)
 	{
-		if (USceneComponent* StrongSceneComp = SceneComponent.Get())
+		if (USceneComponent* StrongSceneComp = WeakSceneComponent.Get())
 		{
 			if (StrongSceneComp->Implements<UTargetPointInterface>())
 			{
@@ -39,7 +61,7 @@ bool FCrimTargetPoint::IsTargetable(AController* Controller) const
 			return true;
 		}
 	
-		if (AActor* StrongActor = Actor.Get())
+		if (AActor* StrongActor = WeakActor.Get())
 		{
 			if (StrongActor->Implements<UTargetPointInterface>())
 			{
@@ -54,12 +76,12 @@ bool FCrimTargetPoint::IsTargetable(AController* Controller) const
 
 FVector FCrimTargetPoint::GetLocation() const
 {
-	if (const USceneComponent* StrongSceneComp = SceneComponent.Get())
+	if (const USceneComponent* StrongSceneComp = WeakSceneComponent.Get())
 	{
 		return StrongSceneComp->GetSocketLocation(SocketName);
 	}
 	
-	if (const AActor* StrongActor = Actor.Get())
+	if (const AActor* StrongActor = WeakActor.Get())
 	{
 		return StrongActor->GetActorLocation();
 	}
@@ -69,7 +91,7 @@ FVector FCrimTargetPoint::GetLocation() const
 
 void FCrimTargetPoint::Reset()
 {
-	SceneComponent = nullptr;
+	WeakSceneComponent = nullptr;
 	SocketName = FName();
-	Actor = nullptr;
+	WeakActor = nullptr;
 }

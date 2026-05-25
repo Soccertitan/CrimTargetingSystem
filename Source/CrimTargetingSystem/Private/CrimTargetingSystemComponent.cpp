@@ -214,13 +214,9 @@ void UCrimTargetingSystemComponent::InitNewTargetPoint(const FCrimTargetPoint& N
 {
 	SetComponentTickEnabled(true);
 	
-	if (const USceneComponent* StrongSceneComp = NewTargetPoint.SceneComponent.Get())
+	if (AActor* OwnerActor = NewTargetPoint.GetActor())
 	{
-		StrongSceneComp->GetOwner()->OnDestroyed.AddUniqueDynamic(this, &UCrimTargetingSystemComponent::OnTargetPointOwnerDestroyed);
-	}
-	else
-	{
-		NewTargetPoint.Actor.Get()->OnDestroyed.AddUniqueDynamic(this, &UCrimTargetingSystemComponent::OnTargetPointOwnerDestroyed);
+		OwnerActor->OnDestroyed.AddUniqueDynamic(this, &UCrimTargetingSystemComponent::OnTargetPointOwnerDestroyed);
 	}
 	
 	GetWorld()->GetTimerManager().SetTimer(
@@ -236,13 +232,9 @@ void UCrimTargetingSystemComponent::DeinitOldTargetPoint(const FCrimTargetPoint&
 {
 	SetComponentTickEnabled(false);
 	
-	if (const USceneComponent* StrongSceneComp = OldTargetPoint.SceneComponent.Get())
+	if (AActor* OwnerActor = OldTargetPoint.GetActor())
 	{
-		StrongSceneComp->GetOwner()->OnDestroyed.RemoveAll(this);
-	}
-	else
-	{
-		OldTargetPoint.Actor.Get()->OnDestroyed.RemoveAll(this);
+		OwnerActor->OnDestroyed.RemoveAll(this);
 	}
 	
 	GetWorld()->GetTimerManager().ClearTimer(CheckTargetPointTimerHandle);

@@ -32,6 +32,13 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Targeting System")
 	static AActor* GetActor(const FCrimTargetPoint& TargetPoint);
 	
+	UFUNCTION(BlueprintPure, Category = "Targeting System", DisplayName = "MakeTargetPoint")
+	static FCrimTargetPoint MakeTargetPointFromHitResult(const FHitResult& HitResult);
+	UFUNCTION(BlueprintPure, Category = "Targeting System", DisplayName = "MakeTargetPoint")
+	static FCrimTargetPoint MakeTargetPointFromActor(AActor* Actor);
+	UFUNCTION(BlueprintPure, Category = "Targeting System", DisplayName = "MakeTargetPoint")
+	static FCrimTargetPoint MakeTargetPointFromSceneComponent(USceneComponent* SceneComponent, FName SocketName);
+	
 	UFUNCTION(BlueprintPure, Category = "Targeting System", meta = (DefaultToSelf="Actor"))
 	static UCrimTargetingSystemComponent* GetCrimTargetingSystemComponent(AActor* Actor, bool bSearchComponent = true);
 };
