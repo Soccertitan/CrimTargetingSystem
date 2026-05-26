@@ -41,4 +41,7 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category = "Targeting System", meta = (DefaultToSelf="Actor"))
 	static UCrimTargetingSystemComponent* GetCrimTargetingSystemComponent(AActor* Actor, bool bSearchComponent = true);
+	
+	UFUNCTION(BlueprintPure, Category = "Targeting System")
+	static bool IsVectorInView(const FMinimalViewInfo& ViewInfo, const FVector& Vector);
 };

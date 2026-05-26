@@ -24,5 +24,5 @@ class CRIMTARGETINGSYSTEM_API ITargetPointInterface
 public:
 	/** Returns true if the Controller can lock onto the point. */
 	UFUNCTION(BlueprintNativeEvent)
-	bool IsTargetPointTargetable(AController* SourceController);
+	bool IsTargetPointTargetable(AActor* Actor);
 };

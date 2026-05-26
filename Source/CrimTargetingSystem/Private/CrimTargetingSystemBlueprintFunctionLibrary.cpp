@@ -6,6 +6,7 @@
 #include "CrimTargetingSystemComponent.h"
 #include "CrimTargetingSystemInterface.h"
 #include "CrimTargetingTypes.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 bool UCrimTargetingSystemBlueprintFunctionLibrary::IsTargetPointValid(const FCrimTargetPoint& TargetPoint)
@@ -58,4 +59,17 @@ UCrimTargetingSystemComponent* UCrimTargetingSystemBlueprintFunctionLibrary::Get
 		}
 	}
 	return nullptr;
+}
+
+bool UCrimTargetingSystemBlueprintFunctionLibrary::IsVectorInView(const FMinimalViewInfo& ViewInfo, const FVector& Vector)
+{
+	FVector ViewDelta = Vector - ViewInfo.Location;
+	ViewDelta.Normalize();
+	const float ForwardDotProduct = FVector::DotProduct(ViewDelta, UKismetMathLibrary::GetForwardVector(ViewInfo.Rotation));
+	
+	if (ForwardDotProduct >= 0.f)
+	{
+		return true;
+	}
+	return false;
 }

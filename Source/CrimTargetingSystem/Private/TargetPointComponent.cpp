@@ -61,7 +61,7 @@ void UTargetPointComponent::SetLockOnPointTag(FGameplayTag& InLockOnPointTag)
 	}
 }
 
-bool UTargetPointComponent::IsTargetPointTargetable_Implementation(AController* SourceController)
+bool UTargetPointComponent::IsTargetPointTargetable_Implementation(AActor* Actor)
 {
 	return bTargetable;
 }
