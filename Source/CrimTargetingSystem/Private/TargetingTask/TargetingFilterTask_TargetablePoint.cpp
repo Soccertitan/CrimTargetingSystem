@@ -25,5 +25,5 @@ bool UTargetingFilterTask_TargetablePoint::ShouldFilterTarget(const FTargetingRe
 			}
 		}
 	}
-	return bFilterResultIfDoesNotImplementInterface;
+	return !bIgnoreTargetPointInterface;
 }

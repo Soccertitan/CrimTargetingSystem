@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CrimTargetingTypes.h"
+#include "ScalableFloat.h"
 #include "Components/ActorComponent.h"
 #include "CrimTargetingSystemComponent.generated.h"
 
@@ -68,15 +69,15 @@ public:
 protected:
 	/** The maximum distance from a TargetPoint that allows locking on. */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System")
-	float MaxTargetingRange = 2000.0f;
+	FScalableFloat MaxTargetingRange = 2000.0f;
 
 	/** Frequency to check if the target is in line of sight, within range, and is generally targetable. */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System")
-	float CheckFrequency = 0.1f;
+	FScalableFloat CheckFrequency = 0.1f;
 	
 	/** The amount of time to break the target when the Actor is too far away or obstructed behind an Object. */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System")
-	float BreakTargetingDelay = 2.0f;
+	FScalableFloat BreakTargetingDelay = 2.0f;
 
 	/** Whether to accept control input when locked on. */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|Rotation")
@@ -84,7 +85,7 @@ protected:
 
 	/** The rate of rotation to face the TargetPoint. */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|Rotation", meta = (ClampMin = 0.f))
-	float CameraInterpSpeed = 0.0f;
+	FScalableFloat CameraInterpSpeed = 0.0f;
 	
 	/**
 	 * Setting this to true will tell the Targeting System to adjust the Pitch Offset (the Y axis) when locked on,
@@ -98,16 +99,16 @@ protected:
 	bool bAdjustPitchBasedOnDistanceToTarget = true;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|Pitch Offset")
-	float PitchDistanceCoefficient = -0.2f;
+	FScalableFloat PitchDistanceCoefficient = -0.2f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|Pitch Offset")
-	float PitchDistanceOffset = 60.0f;
+	FScalableFloat PitchDistanceOffset = 60.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|Pitch Offset")
-	float PitchMin = -50.0f;
+	FScalableFloat PitchMin = -50.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|Pitch Offset")
-	float PitchMax = -20.0f;
+	FScalableFloat PitchMax = -20.0f;
 	
 	virtual void OnRegister() override;
 	

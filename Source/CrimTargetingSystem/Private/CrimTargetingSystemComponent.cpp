@@ -223,7 +223,7 @@ void UCrimTargetingSystemComponent::InitNewTargetPoint(const FCrimTargetPoint& N
 		CheckTargetPointTimerHandle,
 		this,
 		&UCrimTargetingSystemComponent::CheckTargetPoint,
-		CheckFrequency,
+		CheckFrequency.GetValue(),
 		true
 	);
 }
@@ -283,7 +283,7 @@ void UCrimTargetingSystemComponent::CheckTargetPoint()
 			BreakTargetPointTimerHandle,
 			this,
 			&UCrimTargetingSystemComponent::BreakTargeting,
-			BreakTargetingDelay
+			BreakTargetingDelay.GetValue()
 		);
 	}
 }
@@ -314,7 +314,7 @@ bool UCrimTargetingSystemComponent::ShouldBreakTargeting() const
 	}
 	
 	const float Distance = (ControlledPawn->GetActorLocation() - LockOnPointLocation).Size();
-	if (Distance > MaxTargetingRange)
+	if (Distance > MaxTargetingRange.GetValue())
 	{
 		return true;
 	}
@@ -335,7 +335,9 @@ void UCrimTargetingSystemComponent::SetControlRotation(float DeltaTime) const
 {
 	const FRotator TargetControlRotation = GetTargetControlRotation();
 	
-	const FRotator InterpTargetControlRotation = FMath::RInterpTo(Controller->GetControlRotation(), TargetControlRotation, DeltaTime, CameraInterpSpeed);
+	const FRotator InterpTargetControlRotation = FMath::RInterpTo(
+		Controller->GetControlRotation(), 
+		TargetControlRotation, DeltaTime, CameraInterpSpeed.GetValue());
 	Controller->SetControlRotation(InterpTargetControlRotation);
 }
 
@@ -352,8 +354,8 @@ FRotator UCrimTargetingSystemComponent::GetTargetControlRotation() const
 	if (bAdjustPitchBasedOnDistanceToTarget)
 	{
 		const float DistanceToTarget = (PawnLocation - LockOnPointLocation).Size();
-		const float PitchInRange = (DistanceToTarget * PitchDistanceCoefficient + PitchDistanceOffset) * -1.0f;
-		PitchOffset = FMath::Clamp(PitchInRange, PitchMin, PitchMax);
+		const float PitchInRange = (DistanceToTarget * PitchDistanceCoefficient.GetValue() + PitchDistanceOffset.GetValue()) * -1.0f;
+		PitchOffset = FMath::Clamp(PitchInRange, PitchMin.GetValue(), PitchMax.GetValue());
 	}
 	
 	return FRotator(Pitch + PitchOffset, LookRotation.Yaw, ControlRotation.Roll);

@@ -3,7 +3,6 @@
 
 #include "TargetingTask/TargetingSelectionTask_FindNextTarget.h"
 
-#include "CrimTargetingSystemBlueprintFunctionLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 
 void UTargetingSelectionTask_FindNextTarget::Execute(const FTargetingRequestHandle& TargetingHandle) const
@@ -28,29 +27,11 @@ void UTargetingSelectionTask_FindNextTarget::FindNearestTarget(const FTargetingR
 {
 	if (FTargetingDefaultResultsSet* ResultData = FTargetingDefaultResultsSet::Find(TargetingHandle))
 	{
-		FMinimalViewInfo ViewInfo;
-		GetViewInfo(TargetingHandle, ViewInfo);
-		FVector ForwardViewVector = UKismetMathLibrary::GetForwardVector(ViewInfo.Rotation);
-		ForwardViewVector.Normalize();
-		
 		float ClosestDistance = TNumericLimits<float>::Max();
 		int32 ClosestIndex = -1;
 		for (int32 Index = 0; Index < ResultData->TargetResults.Num(); Index++)
 		{
 			const FHitResult& HitResult = ResultData->TargetResults[Index].HitResult;
-			
-			if (bTargetMustBeInView == false)
-			{
-				FVector TargetVector = HitResult.Location - ViewInfo.Location;
-				TargetVector.Normalize();
-				
-				const float ForwardDotProduct = FVector::DotProduct(TargetVector, ForwardViewVector);
-				// Skip targeting a hit if it's behind the view.
-				if (ForwardDotProduct < 0.f)
-				{
-					continue;
-				}
-			}
 			
 			if (HitResult.Distance < ClosestDistance)
 			{
@@ -74,32 +55,33 @@ void UTargetingSelectionTask_FindNextTarget::FindNextTarget(const FTargetingRequ
 {
 	if (FTargetingDefaultResultsSet* ResultData = FTargetingDefaultResultsSet::Find(TargetingHandle))
 	{
-		const EUINavigation SearchDirection = GetSearchDirection(TargetingHandle);
-		
+		const ETargetingSearchDirection SearchDirection = GetSearchDirection(TargetingHandle);
 		const FVector OriginLocation = GetOriginLocation(TargetingHandle);
+		const float DotProductTargetThreshold = GetDotProductTargetThreshold(TargetingHandle);
 		
 		FMinimalViewInfo ViewInfo;
 		GetViewInfo(TargetingHandle, ViewInfo);
 		
-		FVector RightViewVector = UKismetMathLibrary::GetRightVector(ViewInfo.Rotation);
-		RightViewVector.Normalize();
-		FVector UpViewVector = UKismetMathLibrary::GetUpVector(ViewInfo.Rotation);
-		UpViewVector.Normalize();
+		FVector ViewDirection = GetSearchDirectionVector(SearchDirection, ViewInfo);
+		ViewDirection.Normalize();
 		
-		// The target to select if searching Right/Up
+		// The target to select if searching Right/Up/Forward
 		int32 NextTargetIndex = -1;
 		float NextComparison = 0.f;
-		// The target to select if searching Left/Down
+		// The target to select if searching Left/Down/Backward
 		int32 PreviousTargetIndex = -1;
 		float PreviousComparison = 0.f;
 
-		if (SearchDirection == EUINavigation::Right ||
-			SearchDirection == EUINavigation::Up)
+		if (SearchDirection == ETargetingSearchDirection::Right ||
+			SearchDirection == ETargetingSearchDirection::Up ||
+			SearchDirection == ETargetingSearchDirection::Forward)
 		{
+			// Searching on a positive axis, set the NextComparison to the biggest value.
 			NextComparison = 1.f;
 		}
 		else
 		{
+			// Searching on the negative axis. set the starting comparision value to the lowest.
 			PreviousComparison = -1.f;
 		}
 		
@@ -107,87 +89,46 @@ void UTargetingSelectionTask_FindNextTarget::FindNextTarget(const FTargetingRequ
 		{
 			const FHitResult& HitResult = ResultData->TargetResults[Index].HitResult;
 			
-			if (bTargetMustBeInView == false)
-			{
-				const FVector TargetVector = HitResult.GetComponent()->GetSocketLocation(HitResult.BoneName);
-				// Skip targeting a hit if it's behind the view.
-				if (!UCrimTargetingSystemBlueprintFunctionLibrary::IsVectorInView(ViewInfo, TargetVector))
-				{
-					continue;
-				}
-			}
-			
 			FVector DeltaVector = HitResult.GetComponent()->GetSocketLocation(HitResult.BoneName) - OriginLocation;
 			DeltaVector.Normalize();
 			
-			if (SearchDirection == EUINavigation::Right || 
-				SearchDirection == EUINavigation::Left)
+			const float DirectionDotProduct = FVector::DotProduct(DeltaVector, ViewDirection);
+			if (SearchDirection == ETargetingSearchDirection::Right || 
+				SearchDirection == ETargetingSearchDirection::Up ||
+				SearchDirection == ETargetingSearchDirection::Forward)
 			{
-				const float RightDotProduct = FVector::DotProduct(DeltaVector, RightViewVector);
-				if (SearchDirection == EUINavigation::Right)
+				if (DirectionDotProduct > DotProductTargetThreshold && DirectionDotProduct <= NextComparison)
 				{
-					if (RightDotProduct > RightLeftTargetThreshold && RightDotProduct <= NextComparison)
-					{
-						NextComparison = RightDotProduct;
-						NextTargetIndex = Index;
-					}
-					else if (RightDotProduct < -RightLeftTargetThreshold && RightDotProduct <= PreviousComparison)
-					{
-						PreviousComparison = RightDotProduct;
-						PreviousTargetIndex = Index;
-					}
+					NextComparison = DirectionDotProduct;
+					NextTargetIndex = Index;
 				}
-				else
+				else if (DirectionDotProduct < -DotProductTargetThreshold && DirectionDotProduct <= PreviousComparison)
 				{
-					if (RightDotProduct > RightLeftTargetThreshold && RightDotProduct >= NextComparison)
-					{
-						NextComparison = RightDotProduct;
-						NextTargetIndex = Index;
-					}
-					else if (RightDotProduct < -RightLeftTargetThreshold && RightDotProduct >= PreviousComparison)
-					{
-						PreviousComparison = RightDotProduct;
-						PreviousTargetIndex = Index;
-					}
+					PreviousComparison = DirectionDotProduct;
+					PreviousTargetIndex = Index;
 				}
 			}
 			else
 			{
-				// Searching Up and down
-				const float UpDotProduct = FVector::DotProduct(DeltaVector, UpViewVector);
-				if (SearchDirection == EUINavigation::Up)
+				// Searching in reverse for a target.
+				if (DirectionDotProduct > DotProductTargetThreshold && DirectionDotProduct >= NextComparison)
 				{
-					if (UpDotProduct > UpDownTargetThreshold && UpDotProduct <= NextComparison)
-					{
-						NextComparison = UpDotProduct;
-						NextTargetIndex = Index;
-					}
-					else if (UpDotProduct < -UpDownTargetThreshold && UpDotProduct <= PreviousComparison)
-					{
-						PreviousComparison = UpDotProduct;
-						PreviousTargetIndex = Index;
-					}
+					NextComparison = DirectionDotProduct;
+					NextTargetIndex = Index;
 				}
-				else
+				else if (DirectionDotProduct < -DotProductTargetThreshold && DirectionDotProduct >= PreviousComparison)
 				{
-					if (UpDotProduct > UpDownTargetThreshold && UpDotProduct >= NextComparison)
-					{
-						NextComparison = UpDotProduct;
-						NextTargetIndex = Index;
-					}
-					else if (UpDotProduct < -UpDownTargetThreshold && UpDotProduct >= PreviousComparison)
-					{
-						PreviousComparison = UpDotProduct;
-						PreviousTargetIndex = Index;
-					}
+					PreviousComparison = DirectionDotProduct;
+					PreviousTargetIndex = Index;
 				}
 			}
 		}
 		
 		if (NextTargetIndex >= 0 || PreviousTargetIndex >= 0)
 		{
-			if (SearchDirection == EUINavigation::Right ||
-				SearchDirection == EUINavigation::Up)
+			if (SearchDirection == ETargetingSearchDirection::Right ||
+				SearchDirection == ETargetingSearchDirection::Up ||
+				SearchDirection == ETargetingSearchDirection::Forward)
 			{
 				if (ResultData->TargetResults.IsValidIndex(NextTargetIndex))
 				{
@@ -217,7 +158,7 @@ void UTargetingSelectionTask_FindNextTarget::FindNextTarget(const FTargetingRequ
 	}
 }
 
-EUINavigation UTargetingSelectionTask_FindNextTarget::GetSearchDirection(const FTargetingRequestHandle& TargetingHandle) const
+ETargetingSearchDirection UTargetingSelectionTask_FindNextTarget::GetSearchDirection(const FTargetingRequestHandle& TargetingHandle) const
 {
 	return DefaultSearchDirection;
 }
@@ -231,13 +172,24 @@ FVector UTargetingSelectionTask_FindNextTarget::GetOriginLocation(const FTargeti
 	return FVector::ZeroVector;
 }
 
-void UTargetingSelectionTask_FindNextTarget::GetViewInfo(const FTargetingRequestHandle& TargetingHandle, FMinimalViewInfo& OutResult) const
+float UTargetingSelectionTask_FindNextTarget::GetDotProductTargetThreshold(const FTargetingRequestHandle& TargetingHandle) const
 {
-	if (const FTargetingSourceContext* Context = FTargetingSourceContext::Find(TargetingHandle))
+	return FMath::Clamp(DefaultDotProductTargetThreshold.GetValue(), 0.f, 1.f);
+}
+
+FVector UTargetingSelectionTask_FindNextTarget::GetSearchDirectionVector(ETargetingSearchDirection SearchDirection, const FMinimalViewInfo& ViewInfo)
+{
+	if (SearchDirection == ETargetingSearchDirection::Right ||
+		SearchDirection == ETargetingSearchDirection::Left)
 	{
-		if (Context->SourceActor)
-		{
-			Context->SourceActor->CalcCamera(0.f, OutResult);
-		}
+		return UKismetMathLibrary::GetRightVector(ViewInfo.Rotation);
 	}
+	
+	if (SearchDirection == ETargetingSearchDirection::Up ||
+		SearchDirection == ETargetingSearchDirection::Down)
+	{
+		return UKismetMathLibrary::GetUpVector(ViewInfo.Rotation);
+	}
+	
+	return UKismetMathLibrary::GetForwardVector(ViewInfo.Rotation);
 }

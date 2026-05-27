@@ -63,13 +63,16 @@ UCrimTargetingSystemComponent* UCrimTargetingSystemBlueprintFunctionLibrary::Get
 
 bool UCrimTargetingSystemBlueprintFunctionLibrary::IsVectorInView(const FMinimalViewInfo& ViewInfo, const FVector& Vector)
 {
+	//TODO: Check to see if the HitResult is actually in the view. So far just checking if it's in front.
+	
 	FVector ViewDelta = Vector - ViewInfo.Location;
 	ViewDelta.Normalize();
 	const float ForwardDotProduct = FVector::DotProduct(ViewDelta, UKismetMathLibrary::GetForwardVector(ViewInfo.Rotation));
 	
-	if (ForwardDotProduct >= 0.f)
+	if (ForwardDotProduct < 0.f)
 	{
-		return true;
+		return false;
 	}
-	return false;
+	
+	return true;
 }
