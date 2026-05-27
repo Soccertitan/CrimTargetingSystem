@@ -4,7 +4,6 @@
 #include "TargetingTask/TargetingFilterTask_IsInView.h"
 
 #include "CrimTargetingSystemBlueprintFunctionLibrary.h"
-#include "Kismet/KismetMathLibrary.h"
 
 void UTargetingFilterTask_IsInView::Execute(const FTargetingRequestHandle& TargetingHandle) const
 {
@@ -23,7 +22,7 @@ void UTargetingFilterTask_IsInView::Execute(const FTargetingRequestHandle& Targe
 			for (int32 TargetIterator = NumTargets - 1; TargetIterator >= 0; --TargetIterator)
 			{
 				const FTargetingDefaultResultData& TargetResult = ResultData->TargetResults[TargetIterator];
-				if (UCrimTargetingSystemBlueprintFunctionLibrary::IsVectorInView(ViewInfo, 
+				if (UCrimTargetingSystemBlueprintFunctionLibrary::IsLocationWithinView(ViewInfo, 
 					TargetResult.HitResult.GetComponent()->GetSocketLocation(TargetResult.HitResult.BoneName)) == false)
 				{
 					ResultData->TargetResults.RemoveAtSwap(TargetIterator, EAllowShrinking::No);

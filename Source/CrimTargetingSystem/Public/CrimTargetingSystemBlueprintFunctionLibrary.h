@@ -43,5 +43,5 @@ public:
 	static UCrimTargetingSystemComponent* GetCrimTargetingSystemComponent(AActor* Actor, bool bSearchComponent = true);
 	
 	UFUNCTION(BlueprintPure, Category = "Targeting System")
-	static bool IsVectorInView(const FMinimalViewInfo& ViewInfo, const FVector& Vector);
+	static bool IsLocationWithinView(const FMinimalViewInfo& ViewInfo, const FVector& Location);
 };

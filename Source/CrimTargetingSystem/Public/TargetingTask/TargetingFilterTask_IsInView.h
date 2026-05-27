@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "CrimViewTargetingTask.h"
-#include "ScalableFloat.h"
 #include "TargetingFilterTask_IsInView.generated.h"
 
 /**

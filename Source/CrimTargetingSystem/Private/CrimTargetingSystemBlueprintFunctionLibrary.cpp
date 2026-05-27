@@ -6,6 +6,7 @@
 #include "CrimTargetingSystemComponent.h"
 #include "CrimTargetingSystemInterface.h"
 #include "CrimTargetingTypes.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -61,18 +62,32 @@ UCrimTargetingSystemComponent* UCrimTargetingSystemBlueprintFunctionLibrary::Get
 	return nullptr;
 }
 
-bool UCrimTargetingSystemBlueprintFunctionLibrary::IsVectorInView(const FMinimalViewInfo& ViewInfo, const FVector& Vector)
+bool UCrimTargetingSystemBlueprintFunctionLibrary::IsLocationWithinView(const FMinimalViewInfo& ViewInfo, const FVector& Location)
 {
-	//TODO: Check to see if the HitResult is actually in the view. So far just checking if it's in front.
+	FMatrix ViewMatrix;
+	FMatrix ProjectionMatrix;
+    FMatrix ViewProjectionMatrix;
+	UGameplayStatics::GetViewProjectionMatrix(ViewInfo, ViewMatrix, ProjectionMatrix, ViewProjectionMatrix);
 	
-	FVector ViewDelta = Vector - ViewInfo.Location;
-	ViewDelta.Normalize();
-	const float ForwardDotProduct = FVector::DotProduct(ViewDelta, UKismetMathLibrary::GetForwardVector(ViewInfo.Rotation));
+	FVector4 ClipSpacePosition = ViewProjectionMatrix.TransformFVector4(FVector4(Location, 1.0f));
 	
-	if (ForwardDotProduct < 0.f)
+	if (ClipSpacePosition.W <= 0.0f)
 	{
-		return false;
+		return false; 
 	}
 	
-	return true;
+	// Convert to Normalized Device Coordinates (NDC) by performing the perspective divide
+	const float NDCHorizontal = ClipSpacePosition.X / ClipSpacePosition.W;
+	const float NDCVertical   = ClipSpacePosition.Y / ClipSpacePosition.W;
+	const float NDCDepth      = ClipSpacePosition.Z / ClipSpacePosition.W;
+
+	// Check if the point falls cleanly inside the viewing frustum bounds
+	if (FMath::IsWithinInclusive(NDCHorizontal, -1.f, 1.f) &&
+		FMath::IsWithinInclusive(NDCVertical, -1.f, 1.f) &&
+		FMath::IsWithinInclusive(NDCDepth, 0.f, 1.f))
+	{
+		return true;
+	}
+	
+	return false;
 }
