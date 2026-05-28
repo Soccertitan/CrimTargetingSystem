@@ -5,14 +5,15 @@
 #include "CoreMinimal.h"
 #include "CrimTargetingEnums.h"
 #include "CrimViewTargetingTask.h"
-#include "TargetingSelectionTask_FindNextTarget.generated.h"
+#include "ScalableFloat.h"
+#include "TargetingSelectionTask_FindTarget.generated.h"
 
 /**
- * Find a target in the specified direction using the view. If the Context's SourceLocation is empty will search for
+ * Find a target in the specified direction using the view. If the Context's SourceLocation is empty will select
  * the nearest actor.
  */
 UCLASS()
-class CRIMTARGETINGSYSTEM_API UTargetingSelectionTask_FindNextTarget : public UCrimViewTargetingTask
+class CRIMTARGETINGSYSTEM_API UTargetingSelectionTask_FindTarget : public UCrimViewTargetingTask
 {
 	GENERATED_BODY()
 	
@@ -23,11 +24,11 @@ public:
 	void FindNearestTarget(const FTargetingRequestHandle& TargetingHandle) const;
 	
 	/** Selects the next target in the direction. */
-	void FindNextTarget(const FTargetingRequestHandle& TargetingHandle) const;
+	void FindTarget(const FTargetingRequestHandle& TargetingHandle) const;
 	
 protected:
 	virtual ETargetingSearchDirection GetSearchDirection(const FTargetingRequestHandle& TargetingHandle) const;
-	/** The starting location to start a search from. */
+	/** Uses the source location to start searching from that location. */
 	virtual FVector GetOriginLocation(const FTargetingRequestHandle& TargetingHandle) const;
 	
 	/** Returns the normalized degree when searching in a direction. Clamped between 0.f and 1.f */
@@ -38,10 +39,10 @@ protected:
 	
 private:
 	/** The direction to search for targets. */
-	UPROPERTY(EditAnywhere, Category = "Data", DisplayName = "SearchDirection")
+	UPROPERTY(EditAnywhere, Category = "Target Selection Find Target", DisplayName = "SearchDirection")
 	ETargetingSearchDirection DefaultSearchDirection = ETargetingSearchDirection::Right;
 	
 	/** The normalized degree to which the target must be to the positive or negative of the origin point to be targetable expects a value of range of 0-1. */
-	UPROPERTY(EditAnywhere, Category = "Data", meta = (ClampMin = 0, ClampMax = 1), DisplayName = "DotProductTargetThreshold")
+	UPROPERTY(EditAnywhere, Category = "Target Selection Find Target", meta = (ClampMin = 0, ClampMax = 1), DisplayName = "DotProductTargetThreshold")
 	FScalableFloat DefaultDotProductTargetThreshold = 0.f;
 };

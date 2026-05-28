@@ -15,11 +15,10 @@ class CRIMTARGETINGSYSTEM_API UTargetingFilterTask_TargetablePoint : public UTar
 {
 	GENERATED_BODY()
 	
-public:
+protected:
 	/** If true, the filter will not remove the HitResult if it does not implement the TargetPointInterface. */
-	UPROPERTY(EditAnywhere, Category = "Data")
+	UPROPERTY(EditAnywhere, Category = "Target Filter TargetPoint")
 	bool bIgnoreTargetPointInterface = true;
 	
-protected:
 	virtual bool ShouldFilterTarget(const FTargetingRequestHandle& TargetingHandle, const FTargetingDefaultResultData& TargetData) const override;
 };

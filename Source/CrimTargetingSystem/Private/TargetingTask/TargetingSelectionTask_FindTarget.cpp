@@ -1,11 +1,11 @@
 ﻿// Copyright Soccertitan 2026
 
 
-#include "TargetingTask/TargetingSelectionTask_FindNextTarget.h"
+#include "TargetingTask/TargetingSelectionTask_FindTarget.h"
 
 #include "Kismet/KismetMathLibrary.h"
 
-void UTargetingSelectionTask_FindNextTarget::Execute(const FTargetingRequestHandle& TargetingHandle) const
+void UTargetingSelectionTask_FindTarget::Execute(const FTargetingRequestHandle& TargetingHandle) const
 {
 	Super::Execute(TargetingHandle);
 	
@@ -17,13 +17,13 @@ void UTargetingSelectionTask_FindNextTarget::Execute(const FTargetingRequestHand
 	}
 	else
 	{
-		FindNextTarget(TargetingHandle);
+		FindTarget(TargetingHandle);
 	}
 	
 	SetTaskAsyncState(TargetingHandle, ETargetingTaskAsyncState::Completed);
 }
 
-void UTargetingSelectionTask_FindNextTarget::FindNearestTarget(const FTargetingRequestHandle& TargetingHandle) const
+void UTargetingSelectionTask_FindTarget::FindNearestTarget(const FTargetingRequestHandle& TargetingHandle) const
 {
 	if (FTargetingDefaultResultsSet* ResultData = FTargetingDefaultResultsSet::Find(TargetingHandle))
 	{
@@ -51,7 +51,7 @@ void UTargetingSelectionTask_FindNextTarget::FindNearestTarget(const FTargetingR
 	}
 }
 
-void UTargetingSelectionTask_FindNextTarget::FindNextTarget(const FTargetingRequestHandle& TargetingHandle) const
+void UTargetingSelectionTask_FindTarget::FindTarget(const FTargetingRequestHandle& TargetingHandle) const
 {
 	if (FTargetingDefaultResultsSet* ResultData = FTargetingDefaultResultsSet::Find(TargetingHandle))
 	{
@@ -158,12 +158,12 @@ void UTargetingSelectionTask_FindNextTarget::FindNextTarget(const FTargetingRequ
 	}
 }
 
-ETargetingSearchDirection UTargetingSelectionTask_FindNextTarget::GetSearchDirection(const FTargetingRequestHandle& TargetingHandle) const
+ETargetingSearchDirection UTargetingSelectionTask_FindTarget::GetSearchDirection(const FTargetingRequestHandle& TargetingHandle) const
 {
 	return DefaultSearchDirection;
 }
 
-FVector UTargetingSelectionTask_FindNextTarget::GetOriginLocation(const FTargetingRequestHandle& TargetingHandle) const
+FVector UTargetingSelectionTask_FindTarget::GetOriginLocation(const FTargetingRequestHandle& TargetingHandle) const
 {
 	if (const FTargetingSourceContext* Context = FTargetingSourceContext::Find(TargetingHandle))
 	{
@@ -172,12 +172,12 @@ FVector UTargetingSelectionTask_FindNextTarget::GetOriginLocation(const FTargeti
 	return FVector::ZeroVector;
 }
 
-float UTargetingSelectionTask_FindNextTarget::GetDotProductTargetThreshold(const FTargetingRequestHandle& TargetingHandle) const
+float UTargetingSelectionTask_FindTarget::GetDotProductTargetThreshold(const FTargetingRequestHandle& TargetingHandle) const
 {
 	return FMath::Clamp(DefaultDotProductTargetThreshold.GetValue(), 0.f, 1.f);
 }
 
-FVector UTargetingSelectionTask_FindNextTarget::GetSearchDirectionVector(ETargetingSearchDirection SearchDirection, const FMinimalViewInfo& ViewInfo)
+FVector UTargetingSelectionTask_FindTarget::GetSearchDirectionVector(ETargetingSearchDirection SearchDirection, const FMinimalViewInfo& ViewInfo)
 {
 	if (SearchDirection == ETargetingSearchDirection::Right ||
 		SearchDirection == ETargetingSearchDirection::Left)

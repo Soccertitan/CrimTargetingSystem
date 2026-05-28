@@ -7,7 +7,7 @@
 #include "TargetingFilterTask_IsInView.generated.h"
 
 /**
- * Filters out targets that are not in front of the view.
+ * Filters out targets that are not within the view.
  */
 UCLASS()
 class CRIMTARGETINGSYSTEM_API UTargetingFilterTask_IsInView : public UCrimViewTargetingTask

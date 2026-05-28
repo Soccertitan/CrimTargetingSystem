@@ -7,9 +7,9 @@ void UCrimViewTargetingTask::GetViewInfo(const FTargetingRequestHandle& Targetin
 {
 	if (const FTargetingSourceContext* Context = FTargetingSourceContext::Find(TargetingHandle))
 	{
+		OutResult = DefaultViewInfo;
 		if (bUseActorEyes)
 		{
-			OutResult.FOV = FieldOfView.GetValue();
 			if (bPrioritizeSourceActor)
 			{
 				if (Context->SourceActor)

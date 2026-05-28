@@ -41,7 +41,7 @@ void UCrimTargetingSystemComponent::BeginPlay()
 	APlayerController* PC = Cast<APlayerController>(GetOwner());
 	if (PC)
 	{
-		SetPlayerController(PC);
+		SetController(PC);
 	}
 }
 
@@ -134,7 +134,7 @@ void UCrimTargetingSystemComponent::SetLockOnState(const bool bEnable)
 	}
 }
 
-void UCrimTargetingSystemComponent::SetPlayerController(APlayerController* PC)
+void UCrimTargetingSystemComponent::SetController(AController* PC)
 {
 	if (PC != Controller)
 	{
@@ -295,16 +295,19 @@ bool UCrimTargetingSystemComponent::ShouldBreakTargeting() const
 		return true;
 	}
 	
+	FMinimalViewInfo ViewInfo;
+	GetViewInfo(ViewInfo);
 	FHitResult HitResult;
-	FCollisionQueryParams Params = FCollisionQueryParams(FName("LineTraceSingle"));
+	FCollisionQueryParams Params = FCollisionQueryParams(FName("LineTraceSingle"), bComplexTrace);
 	Params.AddIgnoredActor(ControlledPawn);
+	const ECollisionChannel CollisionChannel = UEngineTypes::ConvertToCollisionChannel(TraceChannel);
 	const FVector LockOnPointLocation = UCrimTargetingSystemBlueprintFunctionLibrary::GetTargetPointLocation(TargetPoint);
 	
 	bool bBlockedHit = GetWorld()->LineTraceSingleByChannel(
 		HitResult,
-		ControlledPawn->GetActorLocation(),
+		ViewInfo.Location,
 		LockOnPointLocation,
-		ECC_Visibility,
+		CollisionChannel,
 		Params
 	);
 	
@@ -320,6 +323,33 @@ bool UCrimTargetingSystemComponent::ShouldBreakTargeting() const
 	}
 	
 	return false;
+}
+
+void UCrimTargetingSystemComponent::GetViewInfo(FMinimalViewInfo& OutViewInfo) const
+{
+	OutViewInfo = DefaultViewInfo;
+	if (bActorsEyes)
+	{
+		if (bPawnView && ControlledPawn)
+		{
+			ControlledPawn->GetActorEyesViewPoint(OutViewInfo.Location, OutViewInfo.Rotation);
+		}
+		else if (Controller)
+		{
+			Controller->GetActorEyesViewPoint(OutViewInfo.Location, OutViewInfo.Rotation);
+		}
+	}
+	else
+	{
+		if (bPawnView && ControlledPawn)
+		{
+			ControlledPawn->CalcCamera(0.f, OutViewInfo);
+		}
+		else if (Controller)
+		{
+			Controller->CalcCamera(0.f, OutViewInfo);
+		}
+	}
 }
 
 void UCrimTargetingSystemComponent::BreakTargeting()

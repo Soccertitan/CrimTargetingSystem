@@ -64,7 +64,7 @@ public:
 	
 	/** Call this if the component is attached to a non PC actor. */
 	UFUNCTION(BlueprintCallable, Category = "Targeting System")
-	void SetPlayerController(APlayerController* PC);
+	void SetController(AController* PC);
 
 protected:
 	/** The maximum distance from a TargetPoint that allows locking on. */
@@ -110,6 +110,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|Pitch Offset")
 	FScalableFloat PitchMax = -20.0f;
 	
+	/** If false, will use the controller's view instead of the controlled pawn.*/
+	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|View")
+	bool bPawnView = true;
+	/** If true, will use the Actor's eye view instead of the camera view. */
+	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|View")
+	bool bActorsEyes = false;
+	/** Will use this info if a camera is found. */
+	UPROPERTY(EditAnywhere, Category = "Targeting Task|View", AdvancedDisplay)
+	FMinimalViewInfo DefaultViewInfo;
+	
+	/** The trace channel to use to check for blocks in line of sight. */
+	UPROPERTY(EditAnywhere, Category = "Targeting System|Trace")
+	TEnumAsByte<ETraceTypeQuery> TraceChannel;
+	
+	/** Indicates the trace should perform a complex trace */
+	UPROPERTY(EditAnywhere, Category = "Targeting System|Trace")
+	uint8 bComplexTrace : 1;
+	
 	virtual void OnRegister() override;
 	
 	virtual void OnTargetPointChanged(const FCrimTargetPoint& OldTargetPoint, const FCrimTargetPoint& NewTargetPoint);
@@ -122,6 +140,8 @@ protected:
 	virtual FRotator GetTargetControlRotation() const;
 	/** Returns true if the TargetPoint should be cleared. */
 	virtual bool ShouldBreakTargeting() const;
+	
+	virtual void GetViewInfo(FMinimalViewInfo& OutViewInfo) const;
 	
 	bool HasAuthority() const;
 	
