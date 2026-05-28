@@ -4,6 +4,13 @@
 #include "TargetingTask/TargetingSelectionTask_FindTarget.h"
 
 #include "Kismet/KismetMathLibrary.h"
+#include "TargetingTask/CrimTargetingViewInfo.h"
+
+UTargetingSelectionTask_FindTarget::UTargetingSelectionTask_FindTarget(const FObjectInitializer& ObjectInitializer)
+:Super(ObjectInitializer)
+{
+	TargetingViewInfo = CreateDefaultSubobject<UCrimTargetingViewInfo>(TEXT("TargetingViewInfo"));
+}
 
 void UTargetingSelectionTask_FindTarget::Execute(const FTargetingRequestHandle& TargetingHandle) const
 {
@@ -60,7 +67,7 @@ void UTargetingSelectionTask_FindTarget::FindTarget(const FTargetingRequestHandl
 		const float DotProductTargetThreshold = GetDotProductTargetThreshold(TargetingHandle);
 		
 		FMinimalViewInfo ViewInfo;
-		GetViewInfo(TargetingHandle, ViewInfo);
+		TargetingViewInfo->GetViewInfo(TargetingHandle, ViewInfo);
 		
 		FVector ViewDirection = GetSearchDirectionVector(SearchDirection, ViewInfo);
 		ViewDirection.Normalize();

@@ -1,9 +1,11 @@
 ﻿// Copyright Soccertitan 2026
 
 
-#include "TargetingTask/CrimViewTargetingTask.h"
+#include "TargetingTask/CrimTargetingViewInfo.h"
 
-void UCrimViewTargetingTask::GetViewInfo(const FTargetingRequestHandle& TargetingHandle, FMinimalViewInfo& OutResult) const
+#include "Types/TargetingSystemTypes.h"
+
+void UCrimTargetingViewInfo::GetViewInfo(const FTargetingRequestHandle& TargetingHandle, FMinimalViewInfo& OutResult) const
 {
 	if (const FTargetingSourceContext* Context = FTargetingSourceContext::Find(TargetingHandle))
 	{

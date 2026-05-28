@@ -4,20 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "CrimTargetingEnums.h"
-#include "CrimViewTargetingTask.h"
 #include "ScalableFloat.h"
+#include "Tasks/TargetingTask.h"
 #include "TargetingSelectionTask_FindTarget.generated.h"
+
+class UCrimTargetingViewInfo;
 
 /**
  * Find a target in the specified direction using the view. If the Context's SourceLocation is empty will select
  * the nearest actor.
  */
 UCLASS()
-class CRIMTARGETINGSYSTEM_API UTargetingSelectionTask_FindTarget : public UCrimViewTargetingTask
+class CRIMTARGETINGSYSTEM_API UTargetingSelectionTask_FindTarget : public UTargetingTask
 {
 	GENERATED_BODY()
 	
 public:
+	UTargetingSelectionTask_FindTarget(const FObjectInitializer& ObjectInitializer);
+	
 	virtual void Execute(const FTargetingRequestHandle& TargetingHandle) const override;
 	
 	/** Selects the closest target based on the HitResult distance result. */
@@ -27,6 +31,9 @@ public:
 	void FindTarget(const FTargetingRequestHandle& TargetingHandle) const;
 	
 protected:
+	UPROPERTY(EditAnywhere, Category = "Target View", NoClear)
+	TObjectPtr<UCrimTargetingViewInfo> TargetingViewInfo;
+	
 	virtual ETargetingSearchDirection GetSearchDirection(const FTargetingRequestHandle& TargetingHandle) const;
 	/** Uses the source location to start searching from that location. */
 	virtual FVector GetOriginLocation(const FTargetingRequestHandle& TargetingHandle) const;

@@ -3,16 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Tasks/TargetingTask.h"
-#include "CrimViewTargetingTask.generated.h"
+#include "UObject/Object.h"
+#include "CrimTargetingViewInfo.generated.h"
+
+struct FTargetingRequestHandle;
 
 /**
- * Utility functions to retrieve the view.
+ * Retrieves the ViewInfo from a TargetingContext.
  */
-UCLASS(Abstract)
-class CRIMTARGETINGSYSTEM_API UCrimViewTargetingTask : public UTargetingTask
+UCLASS(DefaultToInstanced, BlueprintType)
+class CRIMTARGETINGSYSTEM_API UCrimTargetingViewInfo : public UObject
 {
 	GENERATED_BODY()
+	
+public:
+	/** Retrieves the view from the SourceActor if valid, otherwise will try and grab it from the Instigator. */
+	virtual void GetViewInfo(const FTargetingRequestHandle& TargetingHandle, FMinimalViewInfo& OutResult) const;
 	
 protected:
 	/** If false, will use the Instigator's view at a higher priority. */
@@ -26,7 +32,4 @@ protected:
 	/** Will use this ViewInfo if a camera is not found. */
 	UPROPERTY(EditAnywhere, Category = "Target View", AdvancedDisplay)
 	FMinimalViewInfo DefaultViewInfo;
-	
-	/** Retrieves the view from the SourceActor if valid, otherwise will try and grab it from the Instigator. */
-	virtual void GetViewInfo(const FTargetingRequestHandle& TargetingHandle, FMinimalViewInfo& OutResult) const;
 };

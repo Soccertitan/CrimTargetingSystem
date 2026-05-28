@@ -3,10 +3,13 @@
 
 #include "TargetingTask/TargetingFilterTask_IsViewBlocked.h"
 
+#include "TargetingTask/CrimTargetingViewInfo.h"
+
 UTargetingFilterTask_IsViewBlocked::UTargetingFilterTask_IsViewBlocked(const FObjectInitializer& ObjectInitializer)
-: Super(ObjectInitializer)
+:Super(ObjectInitializer)
 {
 	bComplexTrace = false;
+	TargetingViewInfo = CreateDefaultSubobject<UCrimTargetingViewInfo>(TEXT("TargetingViewInfo"));
 }
 
 void UTargetingFilterTask_IsViewBlocked::Execute(const FTargetingRequestHandle& TargetingHandle) const
@@ -25,7 +28,7 @@ void UTargetingFilterTask_IsViewBlocked::ExecuteImmediateTrace(const FTargetingR
 		if (FTargetingDefaultResultsSet* ResultData = FTargetingDefaultResultsSet::Find(TargetingHandle))
 		{
 			FMinimalViewInfo ViewInfo;
-			GetViewInfo(TargetingHandle, ViewInfo);
+			TargetingViewInfo->GetViewInfo(TargetingHandle, ViewInfo);
 			const FVector Start = ViewInfo.Location;
 			
 			const int32 NumTargets = ResultData->TargetResults.Num();

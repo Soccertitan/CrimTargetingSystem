@@ -3,14 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CrimViewTargetingTask.h"
+#include "Tasks/TargetingTask.h"
 #include "TargetingFilterTask_IsViewBlocked.generated.h"
 
+class UCrimTargetingViewInfo;
 /**
  * Performs a line trace to each HitResult using the Actor's view. If there is a blocking hit, filters out the HitResult.
  */
 UCLASS()
-class CRIMTARGETINGSYSTEM_API UTargetingFilterTask_IsViewBlocked : public UCrimViewTargetingTask
+class CRIMTARGETINGSYSTEM_API UTargetingFilterTask_IsViewBlocked : public UTargetingTask
 {
 	GENERATED_BODY()
 	
@@ -27,6 +28,9 @@ protected:
 	/** Indicates the trace should perform a complex trace */
 	UPROPERTY(EditAnywhere, Category = "Target Filter View")
 	uint8 bComplexTrace : 1;
+	
+	UPROPERTY(EditAnywhere, Category = "Target View", NoClear)
+	TObjectPtr<UCrimTargetingViewInfo> TargetingViewInfo;
 	
 private:
 	/** Method to process the trace task immediately */
