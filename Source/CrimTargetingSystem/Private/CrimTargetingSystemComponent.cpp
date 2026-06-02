@@ -328,26 +328,15 @@ bool UCrimTargetingSystemComponent::ShouldBreakTargeting() const
 void UCrimTargetingSystemComponent::GetViewInfo(FMinimalViewInfo& OutViewInfo) const
 {
 	OutViewInfo = DefaultViewInfo;
-	if (bActorsEyes)
+	if (ControlledPawn)
 	{
-		if (bPawnView && ControlledPawn)
+		if (bUseActorsEyes)
 		{
 			ControlledPawn->GetActorEyesViewPoint(OutViewInfo.Location, OutViewInfo.Rotation);
 		}
-		else if (Controller)
-		{
-			Controller->GetActorEyesViewPoint(OutViewInfo.Location, OutViewInfo.Rotation);
-		}
-	}
-	else
-	{
-		if (bPawnView && ControlledPawn)
+		else
 		{
 			ControlledPawn->CalcCamera(0.f, OutViewInfo);
-		}
-		else if (Controller)
-		{
-			Controller->CalcCamera(0.f, OutViewInfo);
 		}
 	}
 }

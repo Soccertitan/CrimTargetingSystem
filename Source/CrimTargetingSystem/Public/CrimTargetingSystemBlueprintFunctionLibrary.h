@@ -42,6 +42,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Targeting System", meta = (DefaultToSelf="Actor"))
 	static UCrimTargetingSystemComponent* GetCrimTargetingSystemComponent(AActor* Actor, bool bSearchComponent = true);
 	
+	/** 
+	 * Gets the 2d position relative to the view projection matrix. Returns false if the point is out of bounds the matrix.
+	 * @param ViewProjectionMatrix The projection matrix to check the point against.
+	 * @param WorldPoint The 3d world position to check.
+	 * @param OutPosition The scaled position relative to the center of the view projection.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Targeting System")
-	static bool IsLocationWithinView(const FMinimalViewInfo& ViewInfo, const FVector& Location);
+	static bool ProjectWorldPointToViewProjectionMatrix(const FMatrix& ViewProjectionMatrix, const FVector& WorldPoint, FVector2D& OutPosition);
 };

@@ -109,13 +109,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|Pitch Offset")
 	FScalableFloat PitchMax = -20.0f;
-	
-	/** If false, will use the controller's view instead of the controlled pawn.*/
-	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|View")
-	bool bPawnView = true;
+
 	/** If true, will use the Actor's eye view instead of the camera view. */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting System|View")
-	bool bActorsEyes = false;
+	bool bUseActorsEyes = false;
 	/** Will use this info if a camera is found. */
 	UPROPERTY(EditAnywhere, Category = "Targeting Task|View", AdvancedDisplay)
 	FMinimalViewInfo DefaultViewInfo;
@@ -141,6 +138,7 @@ protected:
 	/** Returns true if the TargetPoint should be cleared. */
 	virtual bool ShouldBreakTargeting() const;
 	
+	/** Returns the controlled pawns view. */
 	virtual void GetViewInfo(FMinimalViewInfo& OutViewInfo) const;
 	
 	bool HasAuthority() const;
